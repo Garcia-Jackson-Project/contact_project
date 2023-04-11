@@ -144,7 +144,7 @@ public class Main {
         String formattedContact = "| ";
         formattedContact += String.format("%-" + longestName + "." + longestName + "s", contactName);
         formattedContact += " | ";
-        formattedContact += String.format("%-" + longestPhone + "." + longestPhone + "s", contactPhone);
+        formattedContact += String.format("%-" + longestPhone + "." + longestPhone + "s", formatPhone(contactPhone));
         formattedContact += " | ";
 
         System.out.println(formattedContact);
@@ -158,5 +158,19 @@ public class Main {
 
         }
         System.out.println(dashes);
+    }
+    public String formatPhone(String phoneNumber){
+
+        StringBuilder sb = new StringBuilder(phoneNumber);
+        if (phoneNumber.length() == 10 ) {
+
+            sb.insert(3, "-").insert(7, "-");
+
+        }
+        if (phoneNumber.length() == 7){
+
+            sb.insert(3, "-");
+        }
+        return sb.toString();
     }
 }
