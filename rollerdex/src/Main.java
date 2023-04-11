@@ -1,8 +1,10 @@
 import util.Input;
 
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.Objects;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class Main {
 
@@ -115,6 +117,28 @@ public class Main {
         contacts.put("Gage Jackson", "5053335678");
         contacts.put("John Voyt", "5122355567");
         contacts.put("Jim Vahn", "5122355568");
+        List<String> contactList = Arrays.asList("Paul Garcia|7025500156" );
+
+        Path dataDirectory = getDataDirectory();
+        Path dataFile = getDataFile();
+        if(Files.notExists(dataDirectory)){
+            try {
+                Files.createDirectories(dataDirectory);
+            }
+            catch(IOException e){
+                throw new RuntimeException(e);
+            }
+        }
+        if(!Files.exists(dataFile)){
+            try {
+                Files.createFile(dataFile);
+                Files.write(dataFile,contactList);
+            }
+            catch(IOException e){
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 
     public int longestName(){
@@ -179,5 +203,16 @@ public class Main {
             sb.insert(3, "-");
         }
         return sb.toString();
+    }
+
+    public Path getDataFile(){
+        String directory = "data";
+        String filename = "contacts.txt";
+        return Paths.get(directory, filename);
+    }
+    public Path getDataDirectory(){
+        String directory = "data";
+
+        return Paths.get(directory);
     }
 }
