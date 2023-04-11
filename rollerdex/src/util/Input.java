@@ -10,7 +10,7 @@ public class Input {
     }
 
     public String getString() {
-        System.out.println("Enter a string: ");
+//        System.out.println("Enter a string: ");
         return scanner.nextLine();
     }
 
@@ -33,7 +33,7 @@ public class Input {
         int input = 0;
 
         do {
-            System.out.printf("Please enter an integer between %d and %d: ", min, max);
+//            System.out.printf("Please enter an integer between %d and %d: ", min, max);
             try{
                 input = scanner.nextInt();
             } catch(InputMismatchException e){
