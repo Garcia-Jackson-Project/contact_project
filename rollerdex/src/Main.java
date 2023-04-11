@@ -60,12 +60,23 @@ public class Main {
         contacts.put(usernameInput,userPhone);
     }
     public void searchContacts(){
+
         System.out.println("Search Contacts");
         System.out.println("Enter the name you are searching for");
 
-//        String search = input.getString();
+        String search = input.getString();
+        boolean foundMatch = false;
         for (String contact: contacts.keySet()){
-            System.out.println(contact);
+
+            if (contact.contains(search)){
+                System.out.print(contact + " ");
+                foundMatch = true;
+                System.out.println(contacts.get(contact));
+            }
+
+        }
+        if(!foundMatch){
+            System.out.println("Please check spelling or that person does not exist");
         }
 
     }
