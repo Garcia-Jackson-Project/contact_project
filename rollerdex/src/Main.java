@@ -9,6 +9,7 @@ public class Main {
     Input input = new Input();
     Boolean keepGoing = true;
     HashMap<String, String> contacts = new HashMap<>();
+
     public static void main (String[] args){
         Main interact = new Main();
         interact.createContacts();
@@ -47,8 +48,9 @@ public class Main {
 
     public void viewContacts(){
 
-        System.out.println("View Contacts");
-        System.out.println(contacts + "-");
+//        System.out.println("View Contacts");
+//        System.out.println(contacts + "-");
+        displayInfo();
     }
     public void addContacts(){
         System.out.println("AddContacts");
@@ -105,12 +107,56 @@ public class Main {
 
 
     public void createContacts (){
-        contacts.put("Paul Garcia", "702550015");
+        contacts.put("Paul Garcia", "7025500156");
         contacts.put("Gage Jackson", "5053335678");
         contacts.put("John Voyt", "5122355567");
         contacts.put("Jim Vahn", "5122355568");
     }
 
+    public int longestName(){
+        int nameLength = 0;
+        for (String contact: contacts.keySet()){
+
+            if(contact.length()>nameLength){
+                nameLength = contact.length();
+            }
 
 
+
+        }
+        return nameLength;
+
+    }
+    public void displayInfo (){
+        int longestName = longestName();
+        int longestPhone = 12;
+        createDashes(longestName + longestPhone + 7);
+        contactName(longestName, longestPhone,"Name","Phone Number");
+        createDashes(longestName + longestPhone + 7);
+        for (String contact: contacts.keySet()){
+            contactName(longestName, longestPhone,contact,contacts.get(contact));
+
+        }
+        createDashes(longestName + longestPhone + 7);
+    }
+    public void contactName(int longestName, int longestPhone, String contactName, String contactPhone){
+
+        String formattedContact = "| ";
+        formattedContact += String.format("%-" + longestName + "." + longestName + "s", contactName);
+        formattedContact += " | ";
+        formattedContact += String.format("%-" + longestPhone + "." + longestPhone + "s", contactPhone);
+        formattedContact += " | ";
+
+        System.out.println(formattedContact);
+    }
+
+
+    public void createDashes(int numOfDashes){
+        String dashes = "";
+        for(int i = 0; i < numOfDashes; i++ ){
+           dashes += "-";
+
+        }
+        System.out.println(dashes);
+    }
 }
