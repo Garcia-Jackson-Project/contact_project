@@ -109,8 +109,16 @@ public class Main {
 
     }
     public void exit(){
-        System.out.println("Save Changes?");
-        saveChanges();
+        System.out.println("Save Changes? y or n");
+        boolean userResponse = input.yesOrNo();
+
+        if(userResponse){
+            saveChanges();
+            System.out.println("Saving changes...");
+
+        }
+
+
         keepGoing = false;
 
     }

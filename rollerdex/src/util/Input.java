@@ -15,16 +15,16 @@ public class Input {
     }
 
     public boolean yesOrNo() {
-        System.out.println("Enter yes or no: ");
+//        System.out.println("Enter yes or no: ");
         String input = scanner.nextLine();
         boolean isYes = input.equalsIgnoreCase("y") || input.equalsIgnoreCase("yes");
-        if (isYes){
-            System.out.println("Yes.");
-
-        }
-        else{
-            System.out.println("No.");
-        }
+//        if (isYes){
+//            System.out.println("Yes.");
+//
+//        }
+//        else{
+//            System.out.println("No.");
+//        }
         return isYes;
 
     }
