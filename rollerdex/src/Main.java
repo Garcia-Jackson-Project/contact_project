@@ -15,12 +15,15 @@ public class Main {
     public static void main (String[] args){
         Main interact = new Main();
         interact.createContacts();
+        interact.parseSavedData();
+
         do {
             int userInput = interact.CLIcreate();
 
             interact.doStuff(userInput);
 
         }while(interact.keepGoing);
+
     }
 
     public int  CLIcreate(){
@@ -106,18 +109,27 @@ public class Main {
 
     }
     public void exit(){
-        System.out.println("Exiting...");
+        System.out.println("Save Changes?");
+        saveChanges();
         keepGoing = false;
+
     }
 
-
+    public void saveChanges(){
+        List<String> newContactList = reverseParse();
+        try{
+            Files.write(getDataFile(),newContactList);
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
+    }
 
     public void createContacts (){
-        contacts.put("Paul Garcia", "7025500156");
-        contacts.put("Gage Jackson", "5053335678");
-        contacts.put("John Voyt", "5122355567");
-        contacts.put("Jim Vahn", "5122355568");
-        List<String> contactList = Arrays.asList("Paul Garcia|7025500156" );
+//        contacts.put("Paul Garcia", "7025500156");
+//        contacts.put("Gage Jackson", "5053335678");
+//        contacts.put("John Voyt", "5122355567");
+//        contacts.put("Jim Vahn", "5122355568");
+        List<String> contactList = Arrays.asList("Paul Garcia|7025500156", "Gage Jackson|5053335678");
 
         Path dataDirectory = getDataDirectory();
         Path dataFile = getDataFile();
@@ -140,6 +152,38 @@ public class Main {
         }
 
     }
+    public List<String> savedContacts(){
+        List<String> aList = new ArrayList<>();
+        try{
+            aList = Files.readAllLines(getDataFile());
+            System.out.println(aList);
+        }
+        catch (IOException e){
+            throw new RuntimeException(e);
+        }
+        return aList;
+    }
+
+    public void parseSavedData(){
+        List<String> savedContactsList = savedContacts();
+        for(String savedContact: savedContactsList){
+            String [] splitter = savedContact.split("\\|");
+            contacts.put(splitter[0],splitter[1]);
+        }
+
+    }
+    public List<String> reverseParse(){
+        List<String> newContactsList = new ArrayList<>();
+        for (Map.Entry<String, String> entry : contacts.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                String contact = key  + "|" + value;
+                newContactsList.add(contact);
+        }
+        return newContactsList ;
+    }
+
+
 
     public int longestName(){
         int nameLength = 0;
