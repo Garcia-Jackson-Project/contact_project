@@ -68,19 +68,23 @@ public class Main {
 
         String search = input.getString();
         boolean foundMatch = false;
+        createDashes();
+        contactName("Name", "Phone Number");
+        createDashes();
         for (String contact: contacts.keySet()){
 
             if (contact.contains(search)){
-                System.out.print(contact + " ");
+
                 foundMatch = true;
-                System.out.println(contacts.get(contact));
+
+                contactName(contact,contacts.get(contact));
             }
 
         }
         if(!foundMatch){
-            System.out.println("Please check spelling or that person does not exist");
+            System.out.println("Please check spelling or that \nperson does not exist");
         }
-
+        createDashes();
     }
     public void deleteContacts(){
 
@@ -128,19 +132,19 @@ public class Main {
 
     }
     public void displayInfo (){
-        int longestName = longestName();
-        int longestPhone = 12;
-        createDashes(longestName + longestPhone + 7);
-        contactName(longestName, longestPhone,"Name","Phone Number");
-        createDashes(longestName + longestPhone + 7);
+
+        createDashes();
+        contactName("Name","Phone Number");
+        createDashes();
         for (String contact: contacts.keySet()){
-            contactName(longestName, longestPhone,contact,contacts.get(contact));
+            contactName(contact,contacts.get(contact));
 
         }
-        createDashes(longestName + longestPhone + 7);
+        createDashes();
     }
-    public void contactName(int longestName, int longestPhone, String contactName, String contactPhone){
-
+    public void contactName( String contactName, String contactPhone){
+        int longestName = longestName();
+        int longestPhone = 12;
         String formattedContact = "| ";
         formattedContact += String.format("%-" + longestName + "." + longestName + "s", contactName);
         formattedContact += " | ";
@@ -151,7 +155,10 @@ public class Main {
     }
 
 
-    public void createDashes(int numOfDashes){
+    public void createDashes(){
+        int longestName = longestName();
+        int longestPhone = 12;
+        int numOfDashes = longestName + longestPhone + 7;
         String dashes = "";
         for(int i = 0; i < numOfDashes; i++ ){
            dashes += "-";
