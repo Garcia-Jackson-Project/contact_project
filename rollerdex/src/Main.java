@@ -9,90 +9,101 @@ import java.util.*;
 public class Main {
 
     Input input = new Input();
-    Boolean keepGoing = true;
+    Boolean runProgram = true;
     HashMap<String, String> contacts = new HashMap<>();
 
+    /*
+    -------------------------------
+    Primary program functionality section
+    -------------------------------
+     */
     public static void main (String[] args){
-        Main interact = new Main();
-        interact.createContacts();
-        interact.parseSavedData();
+        Main rollerDex = new Main();
+        rollerDex.setupFile();
+        rollerDex.parseSavedContacts();
 
         do {
-            int userInput = interact.CLIcreate();
+            int userInput = rollerDex.createCLI();
+            rollerDex.runCLI(userInput);
+        } while(rollerDex.runProgram);
 
-            interact.doStuff(userInput);
-
-        }while(interact.keepGoing);
-
+        System.out.println("Have a great day!");
     }
 
-    public int  CLIcreate(){
+    public int createCLI(){
         System.out.println("Welcome");
+
         System.out.println("1. View contacts.");
         System.out.println("2. Add a new contact.");
         System.out.println("3. Search a contact by name.");
         System.out.println("4. Delete an existing contact.");
         System.out.println("5. Exit.");
+
         System.out.println("Enter an option (1, 2, 3, 4 or 5):");
 
         return input.getInt(1,5);
     }
 
-    public void doStuff (int input){
+    public void runCLI(int input){
         switch (input){
-            case 1  -> viewContacts();
+            case 1 -> viewContacts();
             case 2 -> addContacts() ;
             case 3 -> searchContacts();
             case 4 -> deleteContacts();
             case 5 -> exit();
             default ->
                 System.out.println("Improper input");
-
         }
     }
 
-    public void viewContacts(){
-
-//        System.out.println("View Contacts");
-//        System.out.println(contacts + "-");
-        displayInfo();
+    /*
+    -------------------------------
+    CLI primary functions section
+    -------------------------------
+     */
+    public void viewContacts (){
+        createTableHeader();
+        for (String contact: contacts.keySet()){
+            createContactRow(contact,contacts.get(contact));
+        }
+        createDashes();
     }
+
     public void addContacts(){
-        System.out.println("AddContacts");
-        System.out.println("Enter a name you'd like to add:");
-        String usernameInput = input.getString();
-        System.out.println("Enter the phone number for them, no dashes");
-        String userPhone = input.getString();
+        System.out.println("ADD NEW CONTACT");
 
-        contacts.put(usernameInput,userPhone);
+        System.out.println("Enter new contact name:");
+        String userInputName = input.getString();
+
+        System.out.println("Enter new contact phone number (numbers only)");
+        String userInputPhone = input.getString();
+
+        contacts.put(userInputName,userInputPhone);
     }
-    public void searchContacts(){
 
+    public void searchContacts(){
         System.out.println("Search Contacts");
         System.out.println("Enter the name you are searching for");
 
-        String search = input.getString();
+        String searchInput = input.getString();
         boolean foundMatch = false;
-        createDashes();
-        contactName("Name", "Phone Number");
-        createDashes();
+
+        createTableHeader();
+
         for (String contact: contacts.keySet()){
-
-            if (contact.contains(search)){
-
+            if (contact.contains(searchInput)){
                 foundMatch = true;
-
-                contactName(contact,contacts.get(contact));
+                createContactRow(contact,contacts.get(contact));
             }
-
         }
+
         if(!foundMatch){
-            System.out.println("Please check spelling or that \nperson does not exist");
+            System.out.println("Please check spelling or that\nperson does not exist");
         }
         createDashes();
     }
-    public void deleteContacts(){
 
+    public void deleteContacts(){
         System.out.println("Enter the full name you want to delete:");
         String userInput = input.getString();
         try {
@@ -103,11 +114,12 @@ public class Main {
             else{
                 System.out.println("That name doesn't match, please check spelling");
             }
+
         }catch(InputMismatchException e){
-
+            throw new RuntimeException(e);
         }
-
     }
+
     public void exit(){
         System.out.println("Save Changes? y or n");
         boolean userResponse = input.yesOrNo();
@@ -118,13 +130,35 @@ public class Main {
 
         }
 
+        runProgram = false;
+        System.out.println("Save Changes?");
+        boolean saveChanges = input.yesOrNo();
 
-        keepGoing = false;
+        if(saveChanges){
+            saveChanges();
+        }
 
+        runProgram = false;
+    }
+
+    /*
+    -------------------------------
+    File import and export section
+    -------------------------------
+     */
+    public Path getDataFile(){
+        String directory = "rollerdex/src/data";
+        String filename = "contacts.txt";
+        return Paths.get(directory, filename);
+    }
+
+    public Path getDataDirectory(){
+        String directory = "rollerdex/src/data";
+        return Paths.get(directory);
     }
 
     public void saveChanges(){
-        List<String> newContactList = reverseParse();
+        List<String> newContactList = formatNewContacts();
         try{
             Files.write(getDataFile(),newContactList);
         }catch (IOException e){
@@ -132,15 +166,11 @@ public class Main {
         }
     }
 
-    public void createContacts (){
-//        contacts.put("Paul Garcia", "7025500156");
-//        contacts.put("Gage Jackson", "5053335678");
-//        contacts.put("John Voyt", "5122355567");
-//        contacts.put("Jim Vahn", "5122355568");
+    public void setupFile(){
         List<String> contactList = Arrays.asList("Paul Garcia|7025500156", "Gage Jackson|5053335678");
-
         Path dataDirectory = getDataDirectory();
         Path dataFile = getDataFile();
+
         if(Files.notExists(dataDirectory)){
             try {
                 Files.createDirectories(dataDirectory);
@@ -149,6 +179,7 @@ public class Main {
                 throw new RuntimeException(e);
             }
         }
+
         if(!Files.exists(dataFile)){
             try {
                 Files.createFile(dataFile);
@@ -158,29 +189,29 @@ public class Main {
                 throw new RuntimeException(e);
             }
         }
-
     }
-    public List<String> savedContacts(){
-        List<String> aList = new ArrayList<>();
+
+    public List<String> getSavedContacts(){
+        List<String> contactList = new ArrayList<>();
         try{
-            aList = Files.readAllLines(getDataFile());
-            System.out.println(aList);
+            contactList = Files.readAllLines(getDataFile());
+            System.out.println(contactList);
         }
         catch (IOException e){
             throw new RuntimeException(e);
         }
-        return aList;
+        return contactList;
     }
 
-    public void parseSavedData(){
-        List<String> savedContactsList = savedContacts();
+    public void parseSavedContacts(){
+        List<String> savedContactsList = getSavedContacts();
         for(String savedContact: savedContactsList){
             String [] splitter = savedContact.split("\\|");
             contacts.put(splitter[0],splitter[1]);
         }
-
     }
-    public List<String> reverseParse(){
+
+    public List<String> formatNewContacts(){
         List<String> newContactsList = new ArrayList<>();
         for (Map.Entry<String, String> entry : contacts.entrySet()) {
                 String key = entry.getKey();
@@ -191,80 +222,68 @@ public class Main {
         return newContactsList ;
     }
 
-
-
-    public int longestName(){
-        int nameLength = 0;
-        for (String contact: contacts.keySet()){
-
-            if(contact.length()>nameLength){
-                nameLength = contact.length();
-            }
-
-
-
-        }
-        return nameLength;
-
-    }
-    public void displayInfo (){
-
+    /*
+    -------------------------------
+    Displays CONTACTS table section
+    -------------------------------
+     */
+    public void createTableHeader(){
         createDashes();
-        contactName("Name","Phone Number");
-        createDashes();
-        for (String contact: contacts.keySet()){
-            contactName(contact,contacts.get(contact));
-
-        }
+        createContactRow("Name","Phone Number");
         createDashes();
     }
-    public void contactName( String contactName, String contactPhone){
-        int longestName = longestName();
+
+    public void createContactRow(String contactName, String contactPhone){
+        int longestName = findLongestContactName();
         int longestPhone = 12;
+
         String formattedContact = "| ";
         formattedContact += String.format("%-" + longestName + "." + longestName + "s", contactName);
         formattedContact += " | ";
-        formattedContact += String.format("%-" + longestPhone + "." + longestPhone + "s", formatPhone(contactPhone));
+        formattedContact += String.format("%-" + longestPhone + "." + longestPhone + "s", formatPhoneNumber(contactPhone));
         formattedContact += " | ";
 
         System.out.println(formattedContact);
     }
 
-
     public void createDashes(){
-        int longestName = longestName();
+        int longestName = findLongestContactName();
         int longestPhone = 12;
         int numOfDashes = longestName + longestPhone + 7;
         String dashes = "";
+
         for(int i = 0; i < numOfDashes; i++ ){
            dashes += "-";
-
         }
         System.out.println(dashes);
     }
-    public String formatPhone(String phoneNumber){
 
+
+    /*
+    -------------------------------
+    Simple Utility functions section
+    -------------------------------
+     */
+    public String formatPhoneNumber(String phoneNumber){
         StringBuilder sb = new StringBuilder(phoneNumber);
         if (phoneNumber.length() == 10 ) {
-
             sb.insert(3, "-").insert(7, "-");
-
         }
-        if (phoneNumber.length() == 7){
 
+        if (phoneNumber.length() == 7){
             sb.insert(3, "-");
         }
         return sb.toString();
     }
 
-    public Path getDataFile(){
-        String directory = "data";
-        String filename = "contacts.txt";
-        return Paths.get(directory, filename);
-    }
-    public Path getDataDirectory(){
-        String directory = "data";
+    public int findLongestContactName(){
+        int nameLength = 0;
 
-        return Paths.get(directory);
+        for (String contact: contacts.keySet()){
+            if(contact.length()>nameLength){
+                nameLength = contact.length();
+            }
+        }
+        return nameLength;
     }
 }
