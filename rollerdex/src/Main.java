@@ -62,28 +62,22 @@ public class Main {
     -------------------------------
      */
     public void viewContacts (){
-        createTableHeader();
+        printTableHeader();
         for (String contact: contacts.keySet()){
-            createContactRow(contact,contacts.get(contact));
+            printFormattedContact(contact,contacts.get(contact));
         }
-        createDashes();
+        printDashes();
         System.out.println("\n");
     }
 
     public void addContacts(){
         createHeading("ADD NEW CONTACT");
 
-        System.out.println("Enter new contact name:");
-        String userInputName = input.getString();
+        String userInputName = input.getString("Enter new contact name:");
+        String userInputPhone = input.getString("Enter new contact phone number (numbers only)");
 
-        System.out.println("Enter new contact phone number (numbers only)");
-        String userInputPhone = input.getString();
-
-        boolean isDuplicateName = catchNameDuplicate(userInputName);
-
-        if(isDuplicateName){
-            boolean isOverwrittenContact = overwriteContact();
-            if(isOverwrittenContact){
+        if(contacts.containsKey(userInputName)){
+            if(shouldOverwriteContact()){
                 contacts.put(userInputName,userInputPhone);
             } else {
                 System.out.println("Contact not added");
@@ -95,33 +89,30 @@ public class Main {
 
     public void searchContacts(){
         createHeading("SEARCH FOR CONTACT");
-        System.out.println("Enter the name you are searching for");
 
-        String searchInput = input.getString();
+        String searchInput = input.getString("Enter the name you are searching for");
         boolean foundMatch = false;
 
-        createTableHeader();
+        printTableHeader();
 
         for (String contact: contacts.keySet()){
             if (contact.contains(searchInput)){
                 foundMatch = true;
-                createContactRow(contact,contacts.get(contact));
+                printFormattedContact(contact,contacts.get(contact));
             }
         }
 
         if(!foundMatch){
             System.out.println("Please check spelling or that\nperson does not exist");
         }
-        createDashes();
+        printDashes();
         System.out.println("\n");
     }
 
     public void deleteContacts(){
         createHeading("DELETE A CONTACT");
-        System.out.println("Enter the full name you want to delete:");
-        String userInput = input.getString();
+        String userInput = input.getString("Enter the full name you want to delete:");
         try {
-
             if(contacts.containsKey(userInput)){
                 contacts.remove(userInput);
             }
@@ -136,10 +127,8 @@ public class Main {
 
     public void exit(){
         createHeading("EXIT PROGRAM");
-        System.out.println("Save Changes? y or n");
-        boolean userResponse = input.yesOrNo();
 
-        if(userResponse){
+        if(input.yesOrNo("Save Changes? y or n")){
             saveChanges();
             System.out.println("Saving changes...");
         }
@@ -177,17 +166,9 @@ public class Main {
         Path dataDirectory = getDataDirectory();
         Path dataFile = getDataFile();
 
-        if(Files.notExists(dataDirectory)){
-            try {
-                Files.createDirectories(dataDirectory);
-            }
-            catch(IOException e){
-                throw new RuntimeException(e);
-            }
-        }
-
         if(!Files.exists(dataFile)){
             try {
+                Files.createDirectories(dataDirectory);
                 Files.createFile(dataFile);
                 Files.write(dataFile,contactList);
             }
@@ -232,13 +213,13 @@ public class Main {
     Displays CONTACTS table section
     -------------------------------
      */
-    public void createTableHeader(){
-        createDashes();
-        createContactRow("Name","Phone Number");
-        createDashes();
+    public void printTableHeader(){
+        printDashes();
+        printFormattedContact("Name","Phone Number");
+        printDashes();
     }
 
-    public void createContactRow(String contactName, String contactPhone){
+    public void printFormattedContact(String contactName, String contactPhone){
         int longestName = findLongestContactName();
         int longestPhone = 12;
 
@@ -251,7 +232,7 @@ public class Main {
         System.out.println(formattedContact);
     }
 
-    public void createDashes(){
+    public void printDashes(){
         int longestName = findLongestContactName();
         int longestPhone = 12;
         int numOfDashes = longestName + longestPhone + 7;
@@ -303,20 +284,7 @@ public class Main {
         System.out.println(dashes);
     }
 
-    public boolean catchNameDuplicate(String userInputName){
-        boolean foundDuplicate = false;
-        for (String contact: contacts.keySet()){
-            if (contact.equals(userInputName)) {
-                foundDuplicate = true;
-            }
-        }
-        return foundDuplicate;
-    }
-
-    public boolean overwriteContact(){
-        boolean overwriteContact = false;
-        System.out.println("There is a person with that name already in\nyour contacts already, would you like to\noverwrite them? (y or n)");
-        overwriteContact = input.yesOrNo();
-        return overwriteContact;
+    public boolean shouldOverwriteContact(){
+        return input.yesOrNo("There is a person with that name already in\nyour contacts already, would you like to\noverwrite them? (y or n)");
     }
 }
