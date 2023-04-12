@@ -67,10 +67,11 @@ public class Main {
             createContactRow(contact,contacts.get(contact));
         }
         createDashes();
+        System.out.println("\n");
     }
 
     public void addContacts(){
-        System.out.println("ADD NEW CONTACT");
+        createHeading("ADD NEW CONTACT");
 
         System.out.println("Enter new contact name:");
         String userInputName = input.getString();
@@ -78,11 +79,22 @@ public class Main {
         System.out.println("Enter new contact phone number (numbers only)");
         String userInputPhone = input.getString();
 
-        contacts.put(userInputName,userInputPhone);
+        boolean isDuplicateName = catchNameDuplicate(userInputName);
+
+        if(isDuplicateName){
+            boolean isOverwrittenContact = overwriteContact();
+            if(isOverwrittenContact){
+                contacts.put(userInputName,userInputPhone);
+            } else {
+                System.out.println("Contact not added");
+            }
+        } else {
+            contacts.put(userInputName,userInputPhone);
+        }
     }
 
     public void searchContacts(){
-        System.out.println("Search Contacts");
+        createHeading("SEARCH FOR CONTACT");
         System.out.println("Enter the name you are searching for");
 
         String searchInput = input.getString();
@@ -101,9 +113,11 @@ public class Main {
             System.out.println("Please check spelling or that\nperson does not exist");
         }
         createDashes();
+        System.out.println("\n");
     }
 
     public void deleteContacts(){
+        createHeading("DELETE A CONTACT");
         System.out.println("Enter the full name you want to delete:");
         String userInput = input.getString();
         try {
@@ -121,21 +135,13 @@ public class Main {
     }
 
     public void exit(){
+        createHeading("EXIT PROGRAM");
         System.out.println("Save Changes? y or n");
         boolean userResponse = input.yesOrNo();
 
         if(userResponse){
             saveChanges();
             System.out.println("Saving changes...");
-
-        }
-
-        runProgram = false;
-        System.out.println("Save Changes?");
-        boolean saveChanges = input.yesOrNo();
-
-        if(saveChanges){
-            saveChanges();
         }
 
         runProgram = false;
@@ -195,7 +201,6 @@ public class Main {
         List<String> contactList = new ArrayList<>();
         try{
             contactList = Files.readAllLines(getDataFile());
-            System.out.println(contactList);
         }
         catch (IOException e){
             throw new RuntimeException(e);
@@ -285,5 +290,33 @@ public class Main {
             }
         }
         return nameLength;
+    }
+
+    public void createHeading(String heading){
+        String dashes = "";
+        int numOfDashes = heading.length();
+        for(int i = 0; i < numOfDashes; i++ ){
+            dashes += "-";
+        }
+        System.out.println(dashes);
+        System.out.println(heading);
+        System.out.println(dashes);
+    }
+
+    public boolean catchNameDuplicate(String userInputName){
+        boolean foundDuplicate = false;
+        for (String contact: contacts.keySet()){
+            if (contact.equals(userInputName)) {
+                foundDuplicate = true;
+            }
+        }
+        return foundDuplicate;
+    }
+
+    public boolean overwriteContact(){
+        boolean overwriteContact = false;
+        System.out.println("There is a person with that name already in\nyour contacts already, would you like to\noverwrite them? (y or n)");
+        overwriteContact = input.yesOrNo();
+        return overwriteContact;
     }
 }
