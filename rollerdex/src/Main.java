@@ -223,13 +223,19 @@ public class Main {
         int longestName = findLongestContactName();
         int longestPhone = 12;
 
-        String formattedContact = "| ";
-        formattedContact += String.format("%-" + longestName + "." + longestName + "s", contactName);
-        formattedContact += " | ";
-        formattedContact += String.format("%-" + longestPhone + "." + longestPhone + "s", formatPhoneNumber(contactPhone));
-        formattedContact += " | ";
+        String formattedContact = new StringBuilder()
+            .append("| ")
+            .append(formatContact(longestName,contactName))
+            .append(" | ")
+            .append(formatContact(longestPhone,contactPhone))
+            .append(" | ")
+            .toString();
 
         System.out.println(formattedContact);
+    }
+
+    public String formatContact(int length, String info){
+        return String.format("%-" + length + "." + length + "s", info);
     }
 
     public void printDashes(){
