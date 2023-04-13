@@ -227,7 +227,7 @@ public class Main {
             .append("| ")
             .append(formatContact(longestName,contactName))
             .append(" | ")
-            .append(formatContact(longestPhone,contactPhone))
+            .append(formatContact(longestPhone,formatPhoneNumber(contactPhone)))
             .append(" | ")
             .toString();
 
